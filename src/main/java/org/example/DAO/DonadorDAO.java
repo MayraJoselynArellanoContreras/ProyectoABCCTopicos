@@ -108,4 +108,28 @@ public class DonadorDAO {
 
         return resultado;
     }
+
+    public boolean eliminarDonador(int id) {
+        String sql = "DELETE FROM donador WHERE id = ?";
+        boolean resultado = false;
+
+        try {
+            Connection conn = conexionBD.obtenerConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+
+            int filas = stmt.executeUpdate();
+            if (filas > 0) {
+                resultado = true;
+            }
+
+            stmt.close();
+            conexionBD.cerrarConexion();
+
+        } catch (Exception e) {
+            System.out.println("Error al eliminar donador: " + e.getMessage());
+        }
+
+        return resultado;
+    }
 }
