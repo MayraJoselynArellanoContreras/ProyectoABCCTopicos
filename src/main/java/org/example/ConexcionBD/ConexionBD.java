@@ -29,5 +29,12 @@ public class ConexionBD {
         }
     }
 
-
+    public boolean probarConexion() {
+        try {
+            Connection conn = obtenerConexion();
+            return conn != null && !conn.isClosed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
