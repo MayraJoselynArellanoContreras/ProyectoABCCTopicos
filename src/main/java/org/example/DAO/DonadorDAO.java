@@ -76,4 +76,36 @@ public class DonadorDAO {
 
         return resultado;
     }
+
+    public boolean actualizarDonador(Donador d) {
+        String sql = "UPDATE donador SET nombre=?, direccion=?, telefono=?, correo=?, categoria=?, anio_graduacion=?, monto_donado=? WHERE id=?";
+        boolean resultado = false;
+
+        try {
+            Connection conn = conexionBD.obtenerConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, d.getNombre());
+            stmt.setString(2, d.getDireccion());
+            stmt.setString(3, d.getTelefono());
+            stmt.setString(4, d.getCorreo());
+            stmt.setString(5, d.getCategoria());
+            stmt.setInt(6, d.getAnioGraduacion());
+            stmt.setDouble(7, d.getMontoDonado());
+            stmt.setInt(8, d.getId());
+
+            int filas = stmt.executeUpdate();
+            if (filas > 0) {
+                resultado = true;
+            }
+
+            stmt.close();
+            conexionBD.cerrarConexion();
+
+        } catch (Exception e) {
+            System.out.println("Error al actualizar donador: " + e.getMessage());
+        }
+
+        return resultado;
+    }
 }
