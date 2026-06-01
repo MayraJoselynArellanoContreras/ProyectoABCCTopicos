@@ -45,4 +45,35 @@ public class DonadorDAO {
 
         return donadores;
     }
+
+    public boolean guardarDonador(Donador d) {
+        String sql = "INSERT INTO donador (nombre, direccion, telefono, correo, categoria, anio_graduacion, monto_donado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        boolean resultado = false;
+
+        try {
+            Connection conn = conexionBD.obtenerConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, d.getNombre());
+            stmt.setString(2, d.getDireccion());
+            stmt.setString(3, d.getTelefono());
+            stmt.setString(4, d.getCorreo());
+            stmt.setString(5, d.getCategoria());
+            stmt.setInt(6, d.getAnioGraduacion());
+            stmt.setDouble(7, d.getMontoDonado());
+
+            int filas = stmt.executeUpdate();
+            if (filas > 0) {
+                resultado = true;
+            }
+
+            stmt.close();
+            conexionBD.cerrarConexion();
+
+        } catch (Exception e) {
+            System.out.println("Error al guardar donador: " + e.getMessage());
+        }
+
+        return resultado;
+    }
 }
