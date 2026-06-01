@@ -132,4 +132,39 @@ public class DonadorDAO {
 
         return resultado;
     }
+
+    public ArrayList<Donador> buscarPorNombre(String nombre) {
+        ArrayList<Donador> resultados = new ArrayList<>();
+        String sql = "SELECT * FROM donador WHERE nombre LIKE ? ORDER BY nombre";
+
+        try {
+            Connection conn = conexionBD.obtenerConexion();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, "%" + nombre + "%");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Donador d = new Donador();
+                d.setId(rs.getInt("id"));
+                d.setNombre(rs.getString("nombre"));
+                d.setDireccion(rs.getString("direccion"));
+                d.setTelefono(rs.getString("telefono"));
+                d.setCorreo(rs.getString("correo"));
+                d.setCategoria(rs.getString("categoria"));
+                d.setAnioGraduacion(rs.getInt("anio_graduacion"));
+                d.setMontoDonado(rs.getDouble("monto_donado"));
+                resultados.add(d);
+            }
+
+            rs.close();
+            stmt.close();
+            conexionBD.cerrarConexion();
+
+        } catch (Exception e) {
+            System.out.println("Error en búsqueda: " + e.getMessage());
+        }
+
+        return resultados;
+    }
 }
