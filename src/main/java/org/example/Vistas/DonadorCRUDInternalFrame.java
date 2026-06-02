@@ -1,6 +1,7 @@
 package org.example.Vistas;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class DonadorCRUDInternalFrame extends JInternalFrame {
@@ -76,5 +77,32 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtMonto = new JTextField();
         txtMonto.setBounds(160, 290, 150, 25);
         add(txtMonto);
+
+        JButton btnGuardar = new JButton("Guardar");
+        btnGuardar.setBounds(50, 340, 100, 30);
+        add(btnGuardar);
+
+        JButton btnActualizar = new JButton("Actualizar");
+        btnActualizar.setBounds(170, 340, 100, 30);
+        add(btnActualizar);
+
+        JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(290, 340, 100, 30);
+        add(btnEliminar);
+
+        JButton btnLimpiar = new JButton("Limpiar");
+        btnLimpiar.setBounds(410, 340, 100, 30);
+        add(btnLimpiar);
+
+        JButton btnReestablecer = new JButton("Reestablecer");
+        btnReestablecer.setBounds(530, 340, 120, 30);
+        add(btnReestablecer);
+
+        String[] columnas = {"ID", "Nombre", "Teléfono", "Correo", "Categoría", "Monto"};
+        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0);
+        JTable tablaDonadores = new JTable(modeloTabla);
+        JScrollPane scrollPane = new JScrollPane(tablaDonadores);
+        scrollPane.setBounds(50, 400, 700, 150);
+        add(scrollPane);
     }
 }
