@@ -70,10 +70,11 @@ public class MainFrame extends JFrame {
         bienvenida.setHorizontalAlignment(SwingConstants.CENTER);
         add(bienvenida);
 
-        private void abrirCRUDDonadores() {
-            DonadorCRUDInternalFrame frame = new DonadorCRUDInternalFrame();
-            desktopPane.add(frame);
-            frame.setVisible(true);
-        }
+    }
+
+    private void abrirCRUDDonadores() {
+        DonadorCRUDInternalFrame frame = new DonadorCRUDInternalFrame();
+        desktopPane.add(frame);
+        frame.setVisible(true);
     }
 }
