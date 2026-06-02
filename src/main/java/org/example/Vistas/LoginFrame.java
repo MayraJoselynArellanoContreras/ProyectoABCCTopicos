@@ -22,20 +22,17 @@ public class LoginFrame extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Panel principal con color de fondo
         JPanel panel = new JPanel();
         panel.setBackground(new Color(0, 51, 102));
         panel.setLayout(null);
         add(panel);
 
-        // Título
         JLabel titulo = new JLabel("SISTEMA DE DONATIVOS");
         titulo.setFont(new Font("Arial", Font.BOLD, 18));
         titulo.setForeground(Color.WHITE);
         titulo.setBounds(120, 30, 250, 30);
         panel.add(titulo);
 
-        // Panel de formulario
         JPanel formPanel = new JPanel();
         formPanel.setBackground(Color.WHITE);
         formPanel.setBounds(50, 80, 350, 150);
@@ -58,12 +55,39 @@ public class LoginFrame extends JFrame {
         txtPassword.setBounds(120, 70, 200, 25);
         formPanel.add(txtPassword);
 
-        // Botones
         btnIngresar = new JButton("Ingresar");
         btnIngresar.setBackground(new Color(0, 102, 204));
         btnIngresar.setForeground(Color.WHITE);
         btnIngresar.setBounds(80, 250, 120, 35);
         panel.add(btnIngresar);
+
+        setFocusTraversalPolicy(new FocusTraversalPolicy() {
+            public Component getComponentAfter(Container focusCycleRoot, Component aComponent) {
+                if (aComponent.equals(txtUsuario)) return txtPassword;
+                if (aComponent.equals(txtPassword)) return btnIngresar;
+                return txtUsuario;
+            }
+
+            public Component getComponentBefore(Container focusCycleRoot, Component aComponent) {
+                if (aComponent.equals(txtPassword)) return txtUsuario;
+                if (aComponent.equals(btnIngresar)) return txtPassword;
+                return btnIngresar;
+            }
+
+            public Component getFirstComponent(Container focusCycleRoot) {
+                return txtUsuario;
+            }
+
+            public Component getLastComponent(Container focusCycleRoot) {
+                return btnIngresar;
+            }
+
+            public Component getDefaultComponent(Container focusCycleRoot) {
+                return txtUsuario;
+            }
+        });
+
+        txtPassword.addActionListener(e -> validarLogin());
 
         btnSalir = new JButton("Salir");
         btnSalir.setBackground(new Color(153, 0, 0));
