@@ -16,35 +16,60 @@ public class LoginFrame extends JFrame {
     public LoginFrame() {
         usuarioDAO = new UsuarioDAO();
 
-        setTitle("Sistema de Donativos - Universidad");
-        setSize(400, 300);
+        setTitle("Sistema de Donativos - Universidad Beta");
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(null);
+        setResizable(false);
+
+        // Panel principal con color de fondo
+        JPanel panel = new JPanel();
+        panel.setBackground(new Color(0, 51, 102));
+        panel.setLayout(null);
+        add(panel);
+
+        // Título
+        JLabel titulo = new JLabel("SISTEMA DE DONATIVOS");
+        titulo.setFont(new Font("Arial", Font.BOLD, 18));
+        titulo.setForeground(Color.WHITE);
+        titulo.setBounds(120, 30, 250, 30);
+        panel.add(titulo);
+
+        // Panel de formulario
+        JPanel formPanel = new JPanel();
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBounds(50, 80, 350, 150);
+        formPanel.setLayout(null);
+        panel.add(formPanel);
 
         JLabel lblUsuario = new JLabel("Usuario:");
-        lblUsuario.setBounds(50, 80, 100, 25);
-        add(lblUsuario);
+        lblUsuario.setBounds(30, 30, 80, 25);
+        formPanel.add(lblUsuario);
 
         txtUsuario = new JTextField();
-        txtUsuario.setBounds(150, 80, 180, 25);
-        add(txtUsuario);
+        txtUsuario.setBounds(120, 30, 200, 25);
+        formPanel.add(txtUsuario);
 
         JLabel lblPassword = new JLabel("Contraseña:");
-        lblPassword.setBounds(50, 120, 100, 25);
-        add(lblPassword);
+        lblPassword.setBounds(30, 70, 80, 25);
+        formPanel.add(lblPassword);
 
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(150, 120, 180, 25);
-        add(txtPassword);
+        txtPassword.setBounds(120, 70, 200, 25);
+        formPanel.add(txtPassword);
 
+        // Botones
         btnIngresar = new JButton("Ingresar");
-        btnIngresar.setBounds(100, 180, 100, 30);
-        add(btnIngresar);
+        btnIngresar.setBackground(new Color(0, 102, 204));
+        btnIngresar.setForeground(Color.WHITE);
+        btnIngresar.setBounds(80, 250, 120, 35);
+        panel.add(btnIngresar);
 
         btnSalir = new JButton("Salir");
-        btnSalir.setBounds(220, 180, 100, 30);
-        add(btnSalir);
+        btnSalir.setBackground(new Color(153, 0, 0));
+        btnSalir.setForeground(Color.WHITE);
+        btnSalir.setBounds(250, 250, 120, 35);
+        panel.add(btnSalir);
 
         btnIngresar.addActionListener(e -> validarLogin());
         btnSalir.addActionListener(e -> System.exit(0));
