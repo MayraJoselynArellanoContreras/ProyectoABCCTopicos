@@ -104,18 +104,28 @@ public class LoginFrame extends JFrame {
         String password = new String(txtPassword.getPassword());
 
         if (usuario.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Complete todos los campos");
+            JOptionPane.showMessageDialog(this,
+                    "Por favor ingrese usuario y contraseña",
+                    "Campos vacíos",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         Usuario user = usuarioDAO.validarLogin(usuario, password);
 
         if (user != null) {
-            JOptionPane.showMessageDialog(this, "Bienvenido " + user.getNombreUsuario());
-            new MainFrame().setVisible(true);
+            JOptionPane.showMessageDialog(this,
+                    "Bienvenido " + user.getNombreUsuario(),
+                    "Login exitoso",
+                    JOptionPane.INFORMATION_MESSAGE);
+            MainFrame mainFrame = new MainFrame();
+            mainFrame.setVisible(true);
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
+            JOptionPane.showMessageDialog(this,
+                    "Usuario o contraseña incorrectos.\nIntente nuevamente.",
+                    "Error de autenticación",
+                    JOptionPane.ERROR_MESSAGE);
             txtPassword.setText("");
             txtPassword.requestFocus();
         }
