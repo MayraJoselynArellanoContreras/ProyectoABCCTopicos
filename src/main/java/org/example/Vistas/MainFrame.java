@@ -40,6 +40,20 @@ public class MainFrame extends JFrame {
 
         setJMenuBar(menuBar);
 
+        JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
+
+        JButton btnDonadores = new JButton("Donadores");
+        JButton btnSalirTool = new JButton("Salir");
+
+        toolBar.add(btnDonadores);
+        toolBar.addSeparator();
+        toolBar.add(btnSalirTool);
+
+        add(toolBar, BorderLayout.NORTH);
+
+        btnSalirTool.addActionListener(e -> System.exit(0));
+
         JLabel bienvenida = new JLabel("Bienvenido al Sistema de Donativos");
         bienvenida.setFont(new Font("Arial", Font.BOLD, 20));
         bienvenida.setHorizontalAlignment(SwingConstants.CENTER);
