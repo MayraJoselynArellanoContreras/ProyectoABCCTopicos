@@ -1,4 +1,7 @@
 package org.example.Vistas;
+
+import org.example.DAO.UsuarioDAO;
+import org.example.Modelo.Usuario;
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,8 +11,11 @@ public class LoginFrame extends JFrame {
     private JPasswordField txtPassword;
     private JButton btnIngresar;
     private JButton btnSalir;
+    private UsuarioDAO usuarioDAO;
 
     public LoginFrame() {
+        usuarioDAO = new UsuarioDAO();
+
         setTitle("Sistema de Donativos - Universidad");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,7 +46,30 @@ public class LoginFrame extends JFrame {
         btnSalir.setBounds(220, 180, 100, 30);
         add(btnSalir);
 
+        btnIngresar.addActionListener(e -> validarLogin());
         btnSalir.addActionListener(e -> System.exit(0));
+    }
+
+    private void validarLogin() {
+        String usuario = txtUsuario.getText().trim();
+        String password = new String(txtPassword.getPassword());
+
+        if (usuario.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Complete todos los campos");
+            return;
+        }
+
+        Usuario user = usuarioDAO.validarLogin(usuario, password);
+
+        if (user != null) {
+            JOptionPane.showMessageDialog(this, "Bienvenido " + user.getNombreUsuario());
+            new MainFrame().setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
+            txtPassword.setText("");
+            txtPassword.requestFocus();
+        }
     }
 
     public static void main(String[] args) {
