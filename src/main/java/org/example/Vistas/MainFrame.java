@@ -12,6 +12,7 @@ public class MainFrame extends JFrame {
     private JMenuItem menuSalir;
     private JMenuItem menuDonadores;
     private JMenuItem menuAcerca;
+    private JDesktopPane desktopPane;
 
     public MainFrame() {
         setTitle("Sistema de Donativos - Universidad Beta");
@@ -51,6 +52,12 @@ public class MainFrame extends JFrame {
         toolBar.add(btnSalirTool);
 
         add(toolBar, BorderLayout.NORTH);
+
+        desktopPane = new JDesktopPane();
+        desktopPane.setBackground(new Color(240, 240, 240));
+        add(desktopPane, BorderLayout.CENTER);
+
+        setLayout(new BorderLayout());
 
         btnSalirTool.addActionListener(e -> System.exit(0));
 
