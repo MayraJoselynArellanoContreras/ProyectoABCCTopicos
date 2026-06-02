@@ -18,6 +18,9 @@ public class UsuarioDAO {
 
         try {
             Connection conn = conexionBD.obtenerConexion();
+            if (conn == null) {
+                throw new SQLException("No se pudo establecer la conexión con la base de datos");
+            }
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, usuario);
             stmt.setString(2, password);
