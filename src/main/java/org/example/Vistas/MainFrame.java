@@ -47,6 +47,10 @@ public class MainFrame extends JFrame {
         JButton btnDonadores = new JButton("Donadores");
         JButton btnSalirTool = new JButton("Salir");
 
+        menuDonadores.addActionListener(e -> abrirCRUDDonadores());
+        btnDonadores.addActionListener(e -> abrirCRUDDonadores());
+
+
         toolBar.add(btnDonadores);
         toolBar.addSeparator();
         toolBar.add(btnSalirTool);
@@ -65,5 +69,11 @@ public class MainFrame extends JFrame {
         bienvenida.setFont(new Font("Arial", Font.BOLD, 20));
         bienvenida.setHorizontalAlignment(SwingConstants.CENTER);
         add(bienvenida);
+
+        private void abrirCRUDDonadores() {
+            DonadorCRUDInternalFrame frame = new DonadorCRUDInternalFrame();
+            desktopPane.add(frame);
+            frame.setVisible(true);
+        }
     }
 }
