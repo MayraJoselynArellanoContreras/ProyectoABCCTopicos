@@ -3,9 +3,9 @@ package org.example.Vistas;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import org.example.DAO.DonadorDAO;
 import org.example.Modelo.Donador;
-
 
 public class DonadorCRUDInternalFrame extends JInternalFrame {
 
@@ -19,7 +19,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
     private DonadorDAO donadorDAO;
     private DefaultTableModel modeloTabla;
     private JTable tablaDonadores;
-
 
     public DonadorCRUDInternalFrame() {
         super("ABCC de Donadores", true, true, true, true);
@@ -42,7 +41,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtDireccion = new JTextField();
         txtDireccion.setBounds(160, 90, 250, 25);
         add(txtDireccion);
-
 
         JLabel lblTelefono = new JLabel("Teléfono:");
         lblTelefono.setBounds(50, 130, 100, 25);
@@ -106,20 +104,43 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         add(btnReestablecer);
 
         String[] columnas = {"ID", "Nombre", "Teléfono", "Correo", "Categoría", "Monto"};
-        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0);
-        JTable tablaDonadores = new JTable(modeloTabla);
+        modeloTabla = new DefaultTableModel(columnas, 0);
+        tablaDonadores = new JTable(modeloTabla);
         JScrollPane scrollPane = new JScrollPane(tablaDonadores);
         scrollPane.setBounds(50, 400, 700, 150);
         add(scrollPane);
 
+        tablaDonadores.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            @Override
+            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    cargarDonadorSeleccionado();
+                }
+            }
+        });
+
         donadorDAO = new DonadorDAO();
 
         btnGuardar.addActionListener(e -> guardarDonador());
+        btnActualizar.addActionListener(e -> actualizarDonador());
+        btnEliminar.addActionListener(e -> eliminarDonador());
+        btnLimpiar.addActionListener(e -> limpiarFormulario());
+        btnReestablecer.addActionListener(e -> {
+            limpiarFormulario();
+            JOptionPane.showMessageDialog(this, "Formulario reestablecido");
+        });
 
+        tablaDonadores.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                cargarDonadorSeleccionado();
+            }
+        });
+
+        cargarTabla();
     }
 
+
     private void guardarDonador() {
-        // Validar campos vacíos
         if (txtNombre.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
             txtNombre.requestFocus();
@@ -144,7 +165,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             return;
         }
 
-        // Validar teléfono (solo números)
         String telefono = txtTelefono.getText().trim();
         for (int i = 0; i < telefono.length(); i++) {
             if (!Character.isDigit(telefono.charAt(i))) {
@@ -154,7 +174,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         }
 
-        // Validar correo (debe contener @)
         String correo = txtCorreo.getText().trim();
         if (!correo.contains("@")) {
             JOptionPane.showMessageDialog(this, "El correo debe contener @");
@@ -162,7 +181,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             return;
         }
 
-        // Crear objeto Donador
         Donador d = new Donador();
         d.setNombre(txtNombre.getText().trim());
         d.setDireccion(txtDireccion.getText().trim());
@@ -170,7 +188,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         d.setCorreo(txtCorreo.getText().trim());
         d.setCategoria((String) cbCategoria.getSelectedItem());
 
-        // Año graduación
         int anio = 0;
         if (!txtAnioGraduacion.getText().trim().isEmpty()) {
             try {
@@ -183,7 +200,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         }
 
-        // Monto donado
         double monto = 0;
         if (!txtMonto.getText().trim().isEmpty()) {
             try {
@@ -196,7 +212,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         }
 
-        // Guardar
         if (donadorDAO.guardarDonador(d)) {
             JOptionPane.showMessageDialog(this, "Donador guardado correctamente");
             limpiarFormulario();
@@ -206,7 +221,93 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         }
     }
 
-    // Agregar método limpiarFormulario
+    private void actualizarDonador() {
+        int fila = tablaDonadores.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un donador para actualizar");
+            return;
+        }
+
+        int id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
+            txtNombre.requestFocus();
+            return;
+        }
+
+        Donador d = new Donador();
+        d.setId(id);
+        d.setNombre(txtNombre.getText().trim());
+        d.setDireccion(txtDireccion.getText().trim());
+        d.setTelefono(txtTelefono.getText().trim());
+        d.setCorreo(txtCorreo.getText().trim());
+        d.setCategoria((String) cbCategoria.getSelectedItem());
+
+        int anio = 0;
+        if (!txtAnioGraduacion.getText().trim().isEmpty()) {
+            anio = Integer.parseInt(txtAnioGraduacion.getText().trim());
+        }
+        d.setAnioGraduacion(anio);
+
+        double monto = 0;
+        if (!txtMonto.getText().trim().isEmpty()) {
+            monto = Double.parseDouble(txtMonto.getText().trim());
+        }
+        d.setMontoDonado(monto);
+
+        if (donadorDAO.actualizarDonador(d)) {
+            JOptionPane.showMessageDialog(this, "Donador actualizado correctamente");
+            limpiarFormulario();
+            cargarTabla();
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al actualizar");
+        }
+    }
+
+    private void eliminarDonador() {
+        int fila = tablaDonadores.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un donador para eliminar");
+            return;
+        }
+
+        int id = Integer.parseInt(modeloTabla.getValueAt(fila, 0).toString());
+        String nombre = modeloTabla.getValueAt(fila, 1).toString();
+
+        int confirmar = JOptionPane.showConfirmDialog(this,
+                "¿Está seguro de eliminar a " + nombre + "?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            if (donadorDAO.eliminarDonador(id)) {
+                JOptionPane.showMessageDialog(this, "Donador eliminado correctamente");
+                limpiarFormulario();
+                cargarTabla();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al eliminar");
+            }
+        }
+    }
+
+    private void cargarDonadorSeleccionado() {
+        int fila = tablaDonadores.getSelectedRow();
+        if (fila != -1) {
+            txtNombre.setText(modeloTabla.getValueAt(fila, 1).toString());
+            txtTelefono.setText(modeloTabla.getValueAt(fila, 2).toString());
+            txtCorreo.setText(modeloTabla.getValueAt(fila, 3).toString());
+
+            String categoria = modeloTabla.getValueAt(fila, 4).toString();
+            for (int i = 0; i < cbCategoria.getItemCount(); i++) {
+                if (cbCategoria.getItemAt(i).equals(categoria)) {
+                    cbCategoria.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+    }
+
     private void limpiarFormulario() {
         txtNombre.setText("");
         txtDireccion.setText("");
@@ -216,5 +317,32 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtAnioGraduacion.setText("");
         txtMonto.setText("");
         txtNombre.requestFocus();
+    }
+
+    private void cargarTabla() {
+        Thread hiloCarga = new Thread(new Runnable() {
+            public void run() {
+                ArrayList<Donador> donadores = donadorDAO.listarTodos();
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        modeloTabla.setRowCount(0);
+
+                        for (Donador d : donadores) {
+                            Object[] fila = {
+                                    d.getId(),
+                                    d.getNombre(),
+                                    d.getTelefono(),
+                                    d.getCorreo(),
+                                    d.getCategoria(),
+                                    "$" + d.getMontoDonado()
+                            };
+                            modeloTabla.addRow(fila);
+                        }
+                    }
+                });
+            }
+        });
+        hiloCarga.start();
     }
 }
