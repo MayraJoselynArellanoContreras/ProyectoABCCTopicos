@@ -16,16 +16,20 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
     private JComboBox<String> cbCategoria;
     private JTextField txtAnioGraduacion;
     private JTextField txtMonto;
-    private DonadorDAO donadorDAO;
-    private DefaultTableModel modeloTabla;
-    private JTable tablaDonadores;
     private JTextField txtBuscar;
+    private JTable tablaDonadores;
+    private DefaultTableModel modeloTabla;
+    private DonadorDAO donadorDAO;
 
     public DonadorCRUDInternalFrame() {
         super("ABCC de Donadores", true, true, true, true);
+        donadorDAO = new DonadorDAO();
+
         setSize(800, 600);
         setLocation(50, 50);
         setLayout(null);
+
+        // ========== FORMULARIO ==========
 
         JLabel lblNombre = new JLabel("Nombre:");
         lblNombre.setBounds(50, 50, 100, 25);
@@ -56,7 +60,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
                 char c = evt.getKeyChar();
                 if (!Character.isDigit(c)) {
                     evt.consume();
-                    JOptionPane.showMessageDialog(null, "Solo se permiten números", "Validación", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -80,6 +83,7 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         });
 
+        // Categoría
         JLabel lblCategoria = new JLabel("Categoría:");
         lblCategoria.setBounds(50, 210, 100, 25);
         add(lblCategoria);
@@ -104,24 +108,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
                     evt.consume();
                 }
             }
-
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                String texto = txtAnioGraduacion.getText();
-                if (!texto.isEmpty()) {
-                    try {
-                        int anio = Integer.parseInt(texto);
-                        if (anio < 1950 || anio > 2030) {
-                            txtAnioGraduacion.setForeground(Color.RED);
-                        } else {
-                            txtAnioGraduacion.setForeground(Color.BLACK);
-                        }
-                    } catch (NumberFormatException e) {
-                        txtAnioGraduacion.setForeground(Color.RED);
-                    }
-                } else {
-                    txtAnioGraduacion.setForeground(Color.BLACK);
-                }
-            }
         });
 
         JLabel lblMonto = new JLabel("Monto Donado:");
@@ -138,12 +124,26 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
                 if (!Character.isDigit(c) && c != '.') {
                     evt.consume();
                 }
-                // Evitar múltiples puntos decimales
                 if (c == '.' && txtMonto.getText().contains(".")) {
                     evt.consume();
                 }
             }
         });
+
+        // ========== CAMPO DE BÚSQUEDA ==========
+        JLabel lblBuscar = new JLabel("Buscar:");
+        lblBuscar.setBounds(480, 130, 60, 25);
+        add(lblBuscar);
+
+        txtBuscar = new JTextField();
+        txtBuscar.setBounds(540, 130, 150, 25);
+        add(txtBuscar);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(700, 130, 80, 25);
+        add(btnBuscar);
+
+        // ========== BOTONES ==========
 
         JButton btnGuardar = new JButton("Guardar");
         btnGuardar.setBounds(50, 340, 100, 30);
@@ -165,17 +165,7 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         btnReestablecer.setBounds(530, 340, 120, 30);
         add(btnReestablecer);
 
-        JLabel lblBuscar = new JLabel("Buscar:");
-        lblBuscar.setBounds(480, 130, 60, 25);
-        add(lblBuscar);
-
-        JTextField txtBuscar = new JTextField();
-        txtBuscar.setBounds(540, 130, 150, 25);
-        add(txtBuscar);
-
-        JButton btnBuscar = new JButton("Buscar");
-        btnBuscar.setBounds(700, 130, 80, 25);
-        add(btnBuscar);
+        // ========== TABLA ==========
 
         String[] columnas = {"ID", "Nombre", "Teléfono", "Correo", "Categoría", "Monto"};
         modeloTabla = new DefaultTableModel(columnas, 0);
@@ -184,7 +174,7 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         scrollPane.setBounds(50, 400, 700, 150);
         add(scrollPane);
 
-        donadorDAO = new DonadorDAO();
+        // ========== EVENTOS ==========
 
         btnGuardar.addActionListener(e -> guardarDonador());
         btnActualizar.addActionListener(e -> actualizarDonador());
@@ -194,21 +184,23 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             limpiarFormulario();
             JOptionPane.showMessageDialog(this, "Formulario reestablecido");
         });
+
         btnBuscar.addActionListener(e -> buscarDonadores());
 
-        tablaDonadores.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            @Override
-            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    cargarDonadorSeleccionado();
-                }
+        tablaDonadores.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                cargarDonadorSeleccionado();
             }
         });
 
+        // ========== CARGAR TABLA AL INICIAR ==========
         cargarTabla();
     }
 
+    // ========== MÉTODOS PRINCIPALES ==========
+
     private void guardarDonador() {
+        // Validaciones
         if (txtNombre.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre es obligatorio");
             txtNombre.requestFocus();
@@ -234,12 +226,10 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         }
 
         String telefono = txtTelefono.getText().trim();
-        for (int i = 0; i < telefono.length(); i++) {
-            if (!Character.isDigit(telefono.charAt(i))) {
-                JOptionPane.showMessageDialog(this, "El teléfono debe contener solo números");
-                txtTelefono.requestFocus();
-                return;
-            }
+        if (telefono.length() < 10) {
+            JOptionPane.showMessageDialog(this, "El teléfono debe tener al menos 10 dígitos");
+            txtTelefono.requestFocus();
+            return;
         }
 
         String correo = txtCorreo.getText().trim();
@@ -261,7 +251,7 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             try {
                 anio = Integer.parseInt(txtAnioGraduacion.getText().trim());
                 d.setAnioGraduacion(anio);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "El año debe ser un número válido");
                 txtAnioGraduacion.requestFocus();
                 return;
@@ -273,7 +263,7 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             try {
                 monto = Double.parseDouble(txtMonto.getText().trim());
                 d.setMontoDonado(monto);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "El monto debe ser un número válido");
                 txtMonto.requestFocus();
                 return;
@@ -359,6 +349,8 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         }
     }
 
+    // ========== MÉTODOS DE APOYO ==========
+
     private void cargarDonadorSeleccionado() {
         int fila = tablaDonadores.getSelectedRow();
         if (fila != -1) {
@@ -384,32 +376,28 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         cbCategoria.setSelectedIndex(0);
         txtAnioGraduacion.setText("");
         txtMonto.setText("");
+        txtBuscar.setText("");
         txtNombre.requestFocus();
     }
 
     private void cargarTabla() {
-        Thread hiloCarga = new Thread(new Runnable() {
-            public void run() {
-                ArrayList<Donador> donadores = donadorDAO.listarTodos();
+        Thread hiloCarga = new Thread(() -> {
+            ArrayList<Donador> donadores = donadorDAO.listarTodos();
 
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        modeloTabla.setRowCount(0);
-
-                        for (Donador d : donadores) {
-                            Object[] fila = {
-                                    d.getId(),
-                                    d.getNombre(),
-                                    d.getTelefono(),
-                                    d.getCorreo(),
-                                    d.getCategoria(),
-                                    "$" + d.getMontoDonado()
-                            };
-                            modeloTabla.addRow(fila);
-                        }
-                    }
-                });
-            }
+            SwingUtilities.invokeLater(() -> {
+                modeloTabla.setRowCount(0);
+                for (Donador d : donadores) {
+                    Object[] fila = {
+                            d.getId(),
+                            d.getNombre(),
+                            d.getTelefono(),
+                            d.getCorreo(),
+                            d.getCategoria(),
+                            "$" + d.getMontoDonado()
+                    };
+                    modeloTabla.addRow(fila);
+                }
+            });
         });
         hiloCarga.start();
     }
@@ -421,33 +409,28 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             return;
         }
 
-        // Hilo para la búsqueda
-        Thread hiloBusqueda = new Thread(new Runnable() {
-            public void run() {
-                ArrayList<Donador> resultados = donadorDAO.buscarPorNombre(textoBuscar);
+        Thread hiloBusqueda = new Thread(() -> {
+            ArrayList<Donador> resultados = donadorDAO.buscarPorNombre(textoBuscar);
 
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        modeloTabla.setRowCount(0);
-                        for (Donador d : resultados) {
-                            Object[] fila = {
-                                    d.getId(),
-                                    d.getNombre(),
-                                    d.getTelefono(),
-                                    d.getCorreo(),
-                                    d.getCategoria(),
-                                    "$" + d.getMontoDonado()
-                            };
-                            modeloTabla.addRow(fila);
-                        }
+            SwingUtilities.invokeLater(() -> {
+                modeloTabla.setRowCount(0);
+                for (Donador d : resultados) {
+                    Object[] fila = {
+                            d.getId(),
+                            d.getNombre(),
+                            d.getTelefono(),
+                            d.getCorreo(),
+                            d.getCategoria(),
+                            "$" + d.getMontoDonado()
+                    };
+                    modeloTabla.addRow(fila);
+                }
 
-                        if (resultados.isEmpty()) {
-                            JOptionPane.showMessageDialog(DonadorCRUDInternalFrame.this,
-                                    "No se encontraron donadores con: " + textoBuscar);
-                        }
-                    }
-                });
-            }
+                if (resultados.isEmpty()) {
+                    JOptionPane.showMessageDialog(DonadorCRUDInternalFrame.this,
+                            "No se encontraron donadores con: " + textoBuscar);
+                }
+            });
         });
         hiloBusqueda.start();
     }
