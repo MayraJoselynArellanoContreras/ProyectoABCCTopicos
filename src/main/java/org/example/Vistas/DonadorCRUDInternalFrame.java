@@ -51,6 +51,16 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtTelefono.setBounds(160, 130, 150, 25);
         add(txtTelefono);
 
+        txtTelefono.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    evt.consume();
+                    JOptionPane.showMessageDialog(null, "Solo se permiten números", "Validación", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
         JLabel lblCorreo = new JLabel("Correo:");
         lblCorreo.setBounds(50, 170, 100, 25);
         add(lblCorreo);
@@ -58,6 +68,17 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtCorreo = new JTextField();
         txtCorreo.setBounds(160, 170, 250, 25);
         add(txtCorreo);
+
+        txtCorreo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                String correo = txtCorreo.getText();
+                if (!correo.isEmpty() && !correo.contains("@")) {
+                    txtCorreo.setForeground(Color.RED);
+                } else {
+                    txtCorreo.setForeground(Color.BLACK);
+                }
+            }
+        });
 
         JLabel lblCategoria = new JLabel("Categoría:");
         lblCategoria.setBounds(50, 210, 100, 25);
@@ -76,6 +97,33 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtAnioGraduacion.setBounds(160, 250, 80, 25);
         add(txtAnioGraduacion);
 
+        txtAnioGraduacion.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+                if (!Character.isDigit(c)) {
+                    evt.consume();
+                }
+            }
+
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                String texto = txtAnioGraduacion.getText();
+                if (!texto.isEmpty()) {
+                    try {
+                        int anio = Integer.parseInt(texto);
+                        if (anio < 1950 || anio > 2030) {
+                            txtAnioGraduacion.setForeground(Color.RED);
+                        } else {
+                            txtAnioGraduacion.setForeground(Color.BLACK);
+                        }
+                    } catch (NumberFormatException e) {
+                        txtAnioGraduacion.setForeground(Color.RED);
+                    }
+                } else {
+                    txtAnioGraduacion.setForeground(Color.BLACK);
+                }
+            }
+        });
+
         JLabel lblMonto = new JLabel("Monto Donado:");
         lblMonto.setBounds(50, 290, 100, 25);
         add(lblMonto);
@@ -83,6 +131,19 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtMonto = new JTextField();
         txtMonto.setBounds(160, 290, 150, 25);
         add(txtMonto);
+
+        txtMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                char c = evt.getKeyChar();
+                if (!Character.isDigit(c) && c != '.') {
+                    evt.consume();
+                }
+                // Evitar múltiples puntos decimales
+                if (c == '.' && txtMonto.getText().contains(".")) {
+                    evt.consume();
+                }
+            }
+        });
 
         JButton btnGuardar = new JButton("Guardar");
         btnGuardar.setBounds(50, 340, 100, 30);
