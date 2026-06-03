@@ -19,14 +19,13 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
     private DonadorDAO donadorDAO;
     private DefaultTableModel modeloTabla;
     private JTable tablaDonadores;
+    private JTextField txtBuscar;
 
     public DonadorCRUDInternalFrame() {
         super("ABCC de Donadores", true, true, true, true);
         setSize(800, 600);
         setLocation(50, 50);
         setLayout(null);
-
-        // ========== FORMULARIO ==========
 
         JLabel lblNombre = new JLabel("Nombre:");
         lblNombre.setBounds(50, 50, 100, 25);
@@ -85,8 +84,6 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         txtMonto.setBounds(160, 290, 150, 25);
         add(txtMonto);
 
-        // ========== BOTONES ==========
-
         JButton btnGuardar = new JButton("Guardar");
         btnGuardar.setBounds(50, 340, 100, 30);
         add(btnGuardar);
@@ -107,7 +104,17 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         btnReestablecer.setBounds(530, 340, 120, 30);
         add(btnReestablecer);
 
-        // ========== TABLA ==========
+        JLabel lblBuscar = new JLabel("Buscar:");
+        lblBuscar.setBounds(480, 130, 60, 25);
+        add(lblBuscar);
+
+        JTextField txtBuscar = new JTextField();
+        txtBuscar.setBounds(540, 130, 150, 25);
+        add(txtBuscar);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(700, 130, 80, 25);
+        add(btnBuscar);
 
         String[] columnas = {"ID", "Nombre", "Teléfono", "Correo", "Categoría", "Monto"};
         modeloTabla = new DefaultTableModel(columnas, 0);
@@ -116,10 +123,8 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
         scrollPane.setBounds(50, 400, 700, 150);
         add(scrollPane);
 
-        // ========== INICIALIZAR DAO ==========
         donadorDAO = new DonadorDAO();
 
-        // ========== EVENTOS ==========
         btnGuardar.addActionListener(e -> guardarDonador());
         btnActualizar.addActionListener(e -> actualizarDonador());
         btnEliminar.addActionListener(e -> eliminarDonador());
@@ -128,8 +133,8 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             limpiarFormulario();
             JOptionPane.showMessageDialog(this, "Formulario reestablecido");
         });
+        btnBuscar.addActionListener(e -> buscarDonadores());
 
-        // Evento para seleccionar una fila de la tabla
         tablaDonadores.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             @Override
             public void valueChanged(javax.swing.event.ListSelectionEvent e) {
@@ -139,11 +144,8 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         });
 
-        // ========== CARGAR TABLA AL INICIAR ==========
         cargarTabla();
     }
-
-    // ========== MÉTODOS ==========
 
     private void guardarDonador() {
         if (txtNombre.getText().trim().isEmpty()) {
@@ -349,5 +351,43 @@ public class DonadorCRUDInternalFrame extends JInternalFrame {
             }
         });
         hiloCarga.start();
+    }
+
+    private void buscarDonadores() {
+        String textoBuscar = txtBuscar.getText().trim();
+        if (textoBuscar.isEmpty()) {
+            cargarTabla();
+            return;
+        }
+
+        // Hilo para la búsqueda
+        Thread hiloBusqueda = new Thread(new Runnable() {
+            public void run() {
+                ArrayList<Donador> resultados = donadorDAO.buscarPorNombre(textoBuscar);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        modeloTabla.setRowCount(0);
+                        for (Donador d : resultados) {
+                            Object[] fila = {
+                                    d.getId(),
+                                    d.getNombre(),
+                                    d.getTelefono(),
+                                    d.getCorreo(),
+                                    d.getCategoria(),
+                                    "$" + d.getMontoDonado()
+                            };
+                            modeloTabla.addRow(fila);
+                        }
+
+                        if (resultados.isEmpty()) {
+                            JOptionPane.showMessageDialog(DonadorCRUDInternalFrame.this,
+                                    "No se encontraron donadores con: " + textoBuscar);
+                        }
+                    }
+                });
+            }
+        });
+        hiloBusqueda.start();
     }
 }
